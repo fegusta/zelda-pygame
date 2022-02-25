@@ -1,5 +1,6 @@
 import pygame
 
+from code.weapon import Weapon
 from settings import *
 from tile import Tile
 from player import Player
@@ -17,18 +18,21 @@ class Level:
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
 
+        # attack sprites
+        self.current_attack = None
+
         # sprite group setup
         self.create_map()
 
     def create_map(self):
         layouts = {
-            'boundary': import_csv_layout('./map/map_FloorBlocks.csv'),
-            'grass': import_csv_layout('./map/map_Grass.csv'),
-            'object': import_csv_layout('./map/map_Objects.csv')
+            'boundary': import_csv_layout('../map/map_FloorBlocks.csv'),
+            'grass': import_csv_layout('../map/map_Grass.csv'),
+            'object': import_csv_layout('../map/map_Objects.csv')
         }
         graphics = {
-            'grass': import_folder('./graphics/Grass'),
-            'objects': import_folder('./graphics/objects')
+            'grass': import_folder('../graphics/grass'),
+            'objects': import_folder('../graphics/objects')
         }
 
         for style, layout in layouts.items():
@@ -50,7 +54,15 @@ class Level:
                             surf = graphics['objects'][int(col)]
                             Tile((x,y),[self.visible_sprites,self.obstacle_sprites],'object',surf)
 
-        self.player = Player((2000, 1370), [self.visible_sprites], self.obstacle_sprites)
+        self.player = Player((2000, 1370), [self.visible_sprites], self.obstacle_sprites, self.create_attack, self.destroy_attack)
+
+    def create_attack(self):
+        self.current_attack = Weapon(self.player,[self.visible_sprites])
+
+    def destroy_attack(self):
+        if self.current_attack:
+            self.current_attack.kill()
+        self.current_attack = None
 
 
     def run(self):
@@ -70,7 +82,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.offset = pygame.math.Vector2()
 
         # creating the floor
-        self.floor_surface = pygame.image.load('./graphics/tilemap/ground.png').convert()
+        self.floor_surface = pygame.image.load('../graphics/tilemap/ground.png').convert()
         self.floor_rect = self.floor_surface.get_rect(topleft = (0,0))
 
     def custom_draw(self, player):
