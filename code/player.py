@@ -33,7 +33,7 @@ class Player(Entity):
 		# magic
 		self.create_magic = create_magic
 		self.magic_index = 0
-		self.magic = list(weapon_data.keys())[self.magic_index]
+		self.magic = list(magic_data.keys())[self.magic_index]
 		self.can_swit_magic = True
 		self.magic_switch_time = None
 
@@ -181,6 +181,11 @@ class Player(Entity):
 		base_damage = self.stats['attack']
 		weapon_damage = weapon_data[self.weapon]['damage']
 		return base_damage + weapon_damage
+
+	def get_full_magic_damage(self):
+		base_damage = self.stats['magic']
+		spell_damage = magic_data[self.magic]['strength']
+		return base_damage + spell_damage
 
 	def energy_recovery(self):
 		if self.energy < self.stats['energy']:
